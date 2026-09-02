@@ -1,0 +1,29 @@
+# Maven
+target/
+*.jar
+*.war
+.m2/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.log
+
+# Node (for frontend later)
+node_modules/
+dist/
+build/
+
+# H2 Database
+.h2.db
+test.mv.db
