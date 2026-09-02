@@ -1,9 +1,12 @@
 package com.meridian.capstone.controller;
 
-import com.meridian.capstone.domain.WorkOrderStatus;
+import com.meridian.capstone.domain.WorkOrderStatusHistory;
 import com.meridian.capstone.dto.WorkOrderCreateRequest;
 import com.meridian.capstone.dto.WorkOrderDTO;
+import com.meridian.capstone.dto.WorkOrderStatusTransitionRequest;
+import com.meridian.capstone.domain.WorkOrderStatus;
 import com.meridian.capstone.service.WorkOrderService;
+import com.meridian.capstone.service.WorkOrderStatusTransitionService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,6 +27,9 @@ public class WorkOrderController {
 
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private WorkOrderStatusTransitionService statusTransitionService;
 
     @PostMapping
     public ResponseEntity<WorkOrderDTO> createWorkOrder(@Valid @RequestBody WorkOrderCreateRequest request) {
@@ -84,5 +93,23 @@ public class WorkOrderController {
         log.info("DELETE /api/work-orders/{} - Deleting work order", id);
         workOrderService.deleteWorkOrder(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/transition")
+    public ResponseEntity<WorkOrderDTO> transitionStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody WorkOrderStatusTransitionRequest request,
+            Authentication authentication) {
+        log.info("POST /api/work-orders/{}/transition - Transitioning to status: {}", id, request.getNewStatus());
+        String currentUserEmail = authentication.getName();
+        WorkOrderDTO response = statusTransitionService.transitionStatus(id, request, currentUserEmail);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<WorkOrderStatusHistory>> getStatusHistory(@PathVariable Long id) {
+        log.info("GET /api/work-orders/{}/history - Fetching status history", id);
+        List<WorkOrderStatusHistory> response = statusTransitionService.getStatusHistory(id);
+        return ResponseEntity.ok(response);
     }
 }
