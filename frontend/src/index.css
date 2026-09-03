@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Light Mode */
+body {
+  @apply bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 text-slate-900;
+  background-attachment: fixed;
+}
+
+/* Dark Mode */
+body.dark {
+  @apply bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-slate-100;
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  @apply backdrop-blur-xl bg-glass-light border border-white border-opacity-20 rounded-2xl shadow-glass;
+}
+
+body.dark .glass-card {
+  @apply backdrop-blur-xl bg-glass-dark border border-white border-opacity-10 shadow-glass-dark;
+}
+
+/* Glassmorphism Button */
+.glass-button {
+  @apply px-6 py-2.5 rounded-lg backdrop-blur-md bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-semibold border border-white border-opacity-30 shadow-glass hover:shadow-lg transition-all duration-300 hover:scale-105;
+}
+
+body.dark .glass-button {
+  @apply from-blue-600 to-cyan-600 border-white border-opacity-10;
+}
+
+/* Glassmorphism Input */
+.glass-input {
+  @apply w-full px-4 py-3 rounded-lg backdrop-blur-md bg-white bg-opacity-10 border border-white border-opacity-20 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-opacity-20 transition-all;
+}
+
+body.dark .glass-input {
+  @apply bg-white bg-opacity-5 text-white placeholder-slate-400 border-white border-opacity-10;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+
+body.dark ::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full hover:bg-slate-600;
+}
