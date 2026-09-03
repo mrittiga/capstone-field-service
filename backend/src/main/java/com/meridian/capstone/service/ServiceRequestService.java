@@ -1,14 +1,14 @@
 package com.meridian.capstone.service;
 
+import com.meridian.capstone.domain.Customer;
 import com.meridian.capstone.domain.ServiceRequest;
 import com.meridian.capstone.domain.Site;
-import com.meridian.capstone.domain.User;
 import com.meridian.capstone.dto.ServiceRequestCreateRequest;
 import com.meridian.capstone.dto.ServiceRequestDTO;
 import com.meridian.capstone.exception.ResourceNotFoundException;
+import com.meridian.capstone.repository.CustomerRepository;
 import com.meridian.capstone.repository.ServiceRequestRepository;
 import com.meridian.capstone.repository.SiteRepository;
-import com.meridian.capstone.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public class ServiceRequestService {
     private ServiceRequestRepository serviceRequestRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CustomerRepository customerRepository;
 
     @Autowired
     private SiteRepository siteRepository;
@@ -35,11 +35,11 @@ public class ServiceRequestService {
     @Autowired
     private NotificationService notificationService;
 
-    public ServiceRequestDTO createServiceRequest(ServiceRequestCreateRequest request, String customerEmail) {
-        log.info("Creating service request for customer: {}", customerEmail);
+    public ServiceRequestDTO createServiceRequest(ServiceRequestCreateRequest request, Long customerId) {
+        log.info("Creating service request for customer: {}", customerId);
 
-        User customer = userRepository.findByEmail(customerEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + customerEmail));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + customerId));
 
         ServiceRequest serviceRequest = new ServiceRequest();
         serviceRequest.setCustomer(customer);
@@ -52,7 +52,6 @@ public class ServiceRequestService {
         serviceRequest.setCreatedAt(LocalDateTime.now());
         serviceRequest.setUpdatedAt(LocalDateTime.now());
 
-        // Link to site if provided
         if (request.getSiteId() != null) {
             Site site = siteRepository.findById(request.getSiteId())
                     .orElseThrow(() -> new ResourceNotFoundException("Site not found: " + request.getSiteId()));
@@ -61,15 +60,6 @@ public class ServiceRequestService {
 
         ServiceRequest saved = serviceRequestRepository.save(serviceRequest);
         log.info("Service request created successfully: {}", saved.getId());
-
-        // Create notification for dispatchers
-        notificationService.createNotification(
-                null,
-                "SERVICE_REQUEST",
-                "New Service Request",
-                "New service request from " + customer.getName() + ": " + request.getTitle(),
-                "/service-requests/" + saved.getId()
-        );
 
         return mapToDTO(saved);
     }

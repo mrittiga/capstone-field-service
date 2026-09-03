@@ -26,7 +26,7 @@ public class Invoice {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    private User customer;
+    private Customer customer;
 
     @Column(unique = true)
     private String invoiceNumber;
@@ -36,7 +36,7 @@ public class Invoice {
     private BigDecimal taxAmount;
 
     @Column(nullable = false)
-    private String status = "PENDING"; // PENDING, SENT, PAID, OVERDUE, CANCELLED
+    private String status = "PENDING";
 
     private LocalDateTime issuedDate;
 

@@ -1,13 +1,12 @@
 package com.meridian.capstone.service;
 
+import com.meridian.capstone.domain.Customer;
 import com.meridian.capstone.domain.Invoice;
-import com.meridian.capstone.domain.User;
 import com.meridian.capstone.domain.WorkOrder;
 import com.meridian.capstone.dto.InvoiceCreateRequest;
 import com.meridian.capstone.dto.InvoiceDTO;
 import com.meridian.capstone.exception.ResourceNotFoundException;
 import com.meridian.capstone.repository.InvoiceRepository;
-import com.meridian.capstone.repository.UserRepository;
 import com.meridian.capstone.repository.WorkOrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,6 @@ public class InvoiceService {
 
     @Autowired
     private WorkOrderRepository workOrderRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public InvoiceDTO createInvoice(InvoiceCreateRequest request) {
         log.info("Creating invoice for work order: {}", request.getWorkOrderId());

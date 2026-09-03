@@ -21,7 +21,7 @@ public class ServiceRequest {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    private User customer;
+    private Customer customer;
 
     @Column(nullable = false)
     private String title;
@@ -30,10 +30,10 @@ public class ServiceRequest {
     private String description;
 
     @Column(nullable = false)
-    private String priority; // HIGH, MEDIUM, LOW
+    private String priority;
 
     @Column(nullable = false)
-    private String status = "OPEN"; // OPEN, ASSIGNED, IN_PROGRESS, COMPLETED, CLOSED, CANCELLED
+    private String status = "OPEN";
 
     @ManyToOne
     @JoinColumn(name = "site_id")
@@ -45,7 +45,7 @@ public class ServiceRequest {
 
     private LocalDate requestedDate;
 
-    private String preferredTimeWindow; // MORNING, AFTERNOON, EVENING, FLEXIBLE
+    private String preferredTimeWindow;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

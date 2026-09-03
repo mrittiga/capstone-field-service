@@ -21,7 +21,7 @@ public class InvoiceDTO {
     private String invoiceNumber;
     private BigDecimal totalAmount;
     private BigDecimal taxAmount;
-    private String status; // PENDING, SENT, PAID, OVERDUE, CANCELLED
+    private String status;
     private LocalDateTime issuedDate;
     private LocalDate dueDate;
     private LocalDateTime paidDate;
