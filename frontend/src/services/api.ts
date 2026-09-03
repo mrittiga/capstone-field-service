@@ -23,6 +23,26 @@ export const api = {
     return response.json();
   },
 
+  // Sites
+  getSites: async (page = 0, size = 10) => {
+    const response = await fetch(`${API_BASE}/sites?page=${page}&size=${size}`, {
+      headers: { 'Authorization': `Bearer ${useAuthStore.getState().token}` },
+    });
+    return response.json();
+  },
+
+  createSite: async (data: { customerId: number; name: string; address?: string }) => {
+    const response = await fetch(`${API_BASE}/sites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${useAuthStore.getState().token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
   // Work Orders
   getWorkOrders: async (page = 0, size = 10) => {
     const response = await fetch(`${API_BASE}/work-orders?page=${page}&size=${size}`, {

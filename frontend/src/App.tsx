@@ -5,6 +5,10 @@ import { useAuthStore } from './store/authStore';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { WorkOrderList } from './pages/WorkOrderList';
+import { WorkOrderDetail } from './pages/WorkOrderDetail';
+import { CustomerList } from './pages/CustomerList';
+import { SiteList } from './pages/SiteList';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -46,6 +50,38 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/work-orders" 
+          element={
+            <ProtectedRoute>
+              <WorkOrderList />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/work-orders/:id" 
+          element={
+            <ProtectedRoute>
+              <WorkOrderDetail />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/customers" 
+          element={
+            <ProtectedRoute>
+              <CustomerList />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/sites" 
+          element={
+            <ProtectedRoute>
+              <SiteList />
             </ProtectedRoute>
           } 
         />

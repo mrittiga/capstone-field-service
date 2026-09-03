@@ -13,13 +13,6 @@ export default {
           dark: 'rgba(30, 30, 30, 0.8)',
           darker: 'rgba(20, 20, 20, 0.9)',
         },
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-        },
       },
       backdropBlur: {
         xs: '2px',
