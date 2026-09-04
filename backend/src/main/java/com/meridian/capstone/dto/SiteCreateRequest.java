@@ -17,5 +17,6 @@ public class SiteCreateRequest {
     @NotBlank(message = "Site name is required")
     private String name;
 
+    @NotBlank(message = "Address is required")
     private String address;
 }

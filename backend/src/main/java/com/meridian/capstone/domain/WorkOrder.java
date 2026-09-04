@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "work_order")
@@ -18,6 +17,9 @@ public class WorkOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String workOrderCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id", nullable = false)
@@ -39,7 +41,7 @@ public class WorkOrder {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkOrderStatus status = WorkOrderStatus.NEW;
+    private WorkOrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
@@ -48,13 +50,16 @@ public class WorkOrder {
     @Column(name = "sla_due_date")
     private LocalDateTime slaDueDate;
 
-    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorkOrderStatusHistory> statusHistory;
+    @Column(name = "total_parts_cost")
+    private BigDecimal totalPartsCost;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "total_time_minutes")
+    private Long totalTimeMinutes;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "completed_at")
@@ -64,8 +69,11 @@ public class WorkOrder {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (status == null) {
-            status = WorkOrderStatus.NEW;
+        if (totalPartsCost == null) {
+            totalPartsCost = BigDecimal.ZERO;
+        }
+        if (totalTimeMinutes == null) {
+            totalTimeMinutes = 0L;
         }
     }
 

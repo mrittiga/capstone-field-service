@@ -4,38 +4,38 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "time_log")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "time_log")
 public class TimeLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "work_order_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "work_order_id", nullable = false)
     private WorkOrder workOrder;
 
-    @Column(nullable = false)
-    private LocalDateTime startTime;
-
-    private LocalDateTime endTime;
-
-    private Integer durationMinutes;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "technician_id", nullable = false)
+    private User technician;
 
     @Column(nullable = false)
-    private String logType; // WORK_TIME, TRAVEL_TIME, BREAK, LUNCH
+    private Long minutesSpent;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(columnDefinition = "TEXT")
+    private String note;
+
+    @Column(name = "logged_at", nullable = false)
+    private LocalDateTime loggedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        loggedAt = LocalDateTime.now();
+    }
 }

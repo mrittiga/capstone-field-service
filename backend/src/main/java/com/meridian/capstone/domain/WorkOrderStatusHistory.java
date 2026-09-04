@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,7 +22,7 @@ public class WorkOrderStatusHistory {
     private WorkOrder workOrder;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "from_status")
+    @Column(name = "from_status", nullable = false)
     private WorkOrderStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
@@ -31,13 +30,13 @@ public class WorkOrderStatusHistory {
     private WorkOrderStatus toStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "changed_by_id")
+    @JoinColumn(name = "changed_by_id", nullable = false)
     private User changedBy;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String note;
 
     @PrePersist

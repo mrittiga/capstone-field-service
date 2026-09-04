@@ -4,14 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
+@Entity
+@Table(name = "part")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "part")
 public class Part {
 
     @Id
@@ -21,16 +21,29 @@ public class Part {
     @Column(nullable = false)
     private String name;
 
-    private String description;
-
+    @Column(nullable = false, unique = true)
     private String sku;
 
-    private Double cost;
-
-    private Integer quantity;
+    @Column(nullable = false)
+    private BigDecimal unitCost;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Integer currentStock;
 
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

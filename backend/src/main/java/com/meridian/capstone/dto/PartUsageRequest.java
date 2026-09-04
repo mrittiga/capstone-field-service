@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PartsUsedCreateRequest {
+public class PartUsageRequest {
 
     @NotNull(message = "Part ID is required")
     private Long partId;

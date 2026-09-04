@@ -5,89 +5,64 @@ import com.meridian.capstone.domain.UserRole;
 import com.meridian.capstone.dto.LoginRequest;
 import com.meridian.capstone.dto.LoginResponse;
 import com.meridian.capstone.dto.RegisterRequest;
+import com.meridian.capstone.exception.UnauthorizedException;
 import com.meridian.capstone.repository.UserRepository;
 import com.meridian.capstone.security.JwtTokenProvider;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+    @Transactional
+    public LoginResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
 
-    @Autowired
-    private UserRepository userRepository;
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setName(request.getName());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        User savedUser = userRepository.save(user);
 
-    public LoginResponse login(LoginRequest loginRequest) {
-        log.info("Login attempt for email: {}", loginRequest.getEmail());
-
-        // Authenticate user
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
-
-        // Get user details
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Generate token
-        String token = tokenProvider.generateToken(user.getEmail());
-
-        log.info("Login successful for email: {}", loginRequest.getEmail());
+        String token = jwtTokenProvider.generateToken(savedUser.getEmail(), savedUser.getRole());
 
         return new LoginResponse(
-                token,
-                user.getEmail(),
-                user.getName(),
-                user.getRole().toString(),
-                user.getId()
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getName(),
+            savedUser.getRole(),
+            token
         );
     }
 
-    public LoginResponse register(RegisterRequest registerRequest) {
-        log.info("Registration attempt for email: {}", registerRequest.getEmail());
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
-        // Check if user already exists
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email already registered");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new UnauthorizedException("Invalid email or password");
         }
 
-        // Create new user
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setName(registerRequest.getName());
-        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(UserRole.valueOf(registerRequest.getRole().toUpperCase()));
-
-        userRepository.save(user);
-
-        // Generate token
-        String token = tokenProvider.generateToken(user.getEmail());
-
-        log.info("Registration successful for email: {}", registerRequest.getEmail());
+        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole());
 
         return new LoginResponse(
-                token,
-                user.getEmail(),
-                user.getName(),
-                user.getRole().toString(),
-                user.getId()
+            user.getId(),
+            user.getEmail(),
+            user.getName(),
+            user.getRole(),
+            token
         );
     }
 }

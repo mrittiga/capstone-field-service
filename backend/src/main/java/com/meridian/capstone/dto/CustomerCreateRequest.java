@@ -11,9 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CustomerCreateRequest {
 
-    @NotBlank(message = "Customer name is required")
+    @NotBlank(message = "Name is required")
     private String name;
 
+    @NotBlank(message = "Contact email is required")
     @Email(message = "Contact email should be valid")
     private String contactEmail;
+
+    @NotBlank(message = "Phone is required")
+    private String phone;
 }

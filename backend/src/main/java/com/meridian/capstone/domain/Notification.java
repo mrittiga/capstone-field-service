@@ -4,37 +4,40 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "notification")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "notification")
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private String type; // WORK_ORDER_UPDATE, ASSIGNMENT, SLA_ALERT, MESSAGE, SYSTEM_ALERT, REMINDER
-
-    @Column(nullable = false)
-    private String title;
-
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "is_read")
-    private Boolean isRead = false;
-
-    private String actionUrl;
-
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String type;
+
+    @Column(name = "is_read", nullable = false)
+    private Boolean isRead;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        if (isRead == null) {
+            isRead = false;
+        }
+    }
 }

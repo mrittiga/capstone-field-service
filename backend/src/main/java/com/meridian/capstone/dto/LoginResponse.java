@@ -1,5 +1,6 @@
 package com.meridian.capstone.dto;
 
+import com.meridian.capstone.domain.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
 
-    private String token;
+    private Long id;
     private String email;
     private String name;
-    private String role;
-    private Long userId;
+    private UserRole role;
+    private String token;
 }
