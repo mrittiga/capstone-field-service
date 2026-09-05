@@ -1,28 +1,37 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
+import Layout from './components/Layout';
 import DispatcherDashboard from './pages/dispatcher/DispatcherDashboard';
-import TechnicianDashboard from './pages/technician/TechnicianDashboard';
-import ManagerDashboard from './pages/manager/ManagerDashboard';
-import CustomerPortal from './pages/customer/CustomerPortal';
+import WorkOrderBoard from './pages/dispatcher/WorkOrderBoard';
+import CustomerManagement from './pages/dispatcher/CustomerManagement';
+import { WorkOrderProvider } from './context/WorkOrderContext';
+
+const dispatcherItems = [
+  { label: 'Work Orders', path: '/dispatcher' },
+  { label: 'Kanban Board', path: '/dispatcher/kanban' },
+  { label: 'Customers', path: '/dispatcher/customers' },
+];
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <WorkOrderProvider>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      <Route path="/dispatcher/*" element={<DispatcherDashboard />} />
-      <Route path="/technician/*" element={<TechnicianDashboard />} />
-      <Route path="/manager/*" element={<ManagerDashboard />} />
-      <Route path="/customer/*" element={<CustomerPortal />} />
+        {/* Dispatcher Nested Routes */}
+        <Route path="/dispatcher" element={<Layout sidebarItems={dispatcherItems} />}>
+          <Route index element={<DispatcherDashboard />} />
+          <Route path="kanban" element={<WorkOrderBoard />} />
+          <Route path="customers" element={<CustomerManagement />} />
+        </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </WorkOrderProvider>
   );
 }
 

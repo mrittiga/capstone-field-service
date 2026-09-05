@@ -1,29 +1,22 @@
+// src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { WorkOrderProvider } from './context/WorkOrderContext';
-import { ErrorBoundary } from './components/ErrorBoundary';
 
-const rootElement = document.getElementById('root');
-
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <AuthProvider>
-            <WorkOrderProvider>
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-            </WorkOrderProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
-    </React.StrictMode>
-  );
-}
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
 

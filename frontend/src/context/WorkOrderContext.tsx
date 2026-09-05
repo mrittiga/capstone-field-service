@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { fetchWithAuth } from '../services/api';
 
 export interface WorkOrder {
   id: string;
@@ -19,20 +20,46 @@ interface WorkOrderContextType {
   orders: WorkOrder[];
   addOrder: (order: WorkOrder) => void;
   updateStatus: (id: string, status: WorkOrder['status']) => void;
+  loading: boolean;
 }
 
 const WorkOrderContext = createContext<WorkOrderContextType | undefined>(undefined);
 
 export const WorkOrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<WorkOrder[]>(initialOrders);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const addOrder = (newOrder: WorkOrder) => setOrders(prev => [...prev, newOrder]);
-  const updateStatus = (id: string, status: WorkOrder['status']) => {
+  useEffect(() => {
+    const loadBackendOrders = async () => {
+      setLoading(true);
+      const data = await fetchWithAuth('/work-orders');
+      if (data && Array.isArray(data) && data.length > 0) {
+        setOrders(data);
+      }
+      setLoading(false);
+    };
+
+    loadBackendOrders();
+  }, []);
+
+  const addOrder = async (newOrder: WorkOrder) => {
+    setOrders(prev => [...prev, newOrder]);
+    await fetchWithAuth('/work-orders', {
+      method: 'POST',
+      body: JSON.stringify(newOrder),
+    });
+  };
+
+  const updateStatus = async (id: string, status: WorkOrder['status']) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    await fetchWithAuth(`/work-orders/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
   };
 
   return (
-    <WorkOrderContext.Provider value={{ orders, addOrder, updateStatus }}>
+    <WorkOrderContext.Provider value={{ orders, addOrder, updateStatus, loading }}>
       {children}
     </WorkOrderContext.Provider>
   );

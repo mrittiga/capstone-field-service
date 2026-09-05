@@ -1,163 +1,121 @@
-import { useState, useEffect } from 'react'
-import { Customer } from '../../types/index'
+import React, { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../../services/api';
+
+interface Customer {
+  id: string;
+  name: string;
+  contactEmail: string;
+  phone: string;
+}
+
+const fallbackCustomers: Customer[] = [
+  { id: 'CUST-01', name: 'Acme Corp', contactEmail: 'contact@acme.com', phone: '+1 555-0192' },
+  { id: 'CUST-02', name: 'Global Tech', contactEmail: 'info@globaltech.com', phone: '+1 555-0143' },
+  { id: 'CUST-03', name: 'Nexus Ltd', contactEmail: 'support@nexus.com', phone: '+1 555-0188' },
+];
 
 export default function CustomerManagement() {
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    contactEmail: '',
-    phone: ''
-  })
+  const [customers, setCustomers] = useState<Customer[]>(fallbackCustomers);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({ name: '', contactEmail: '', phone: '' });
 
   useEffect(() => {
-    fetchCustomers()
-  }, [])
+    const fetchCustomers = async () => {
+      setLoading(true);
+      const data = await fetchWithAuth('/customers?size=50');
+      if (data && data.content && Array.isArray(data.content)) {
+        setCustomers(data.content);
+      }
+      setLoading(false);
+    };
 
-  const fetchCustomers = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/customers?size=50', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      })
-      const data = await response.json()
-      setCustomers(data.content || [])
-    } catch (error) {
-      console.error('Failed to fetch customers', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    fetchCustomers();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const response = await fetch('/api/customers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(formData)
-      })
-      
-      if (response.ok) {
-        setFormData({ name: '', contactEmail: '', phone: '' })
-        setShowForm(false)
-        fetchCustomers()
-      }
-    } catch (error) {
-      console.error('Failed to create customer', error)
-    }
-  }
+    e.preventDefault();
+    const newCustomer: Customer = {
+      id: `CUST-0${customers.length + 1}`,
+      ...formData,
+    };
+
+    setCustomers((prev) => [...prev, newCustomer]);
+    setFormData({ name: '', contactEmail: '', phone: '' });
+    setShowForm(false);
+
+    await fetchWithAuth('/customers', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+    });
+  };
 
   return (
     <div>
-      {/* Create Button */}
-      <div style={{ marginBottom: '2rem' }}>
-        <button 
+      <div style={{ marginBottom: '20px' }}>
+        <button
           onClick={() => setShowForm(!showForm)}
-          className="btn btn-primary"
+          style={{ padding: '10px 18px', backgroundColor: '#0284c7', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
         >
           {showForm ? 'Cancel' : '➕ New Customer'}
         </button>
       </div>
 
-      {/* Create Form */}
       {showForm && (
-        <div className="glass" style={{
-          padding: '2rem',
-          marginBottom: '2rem',
-          borderRadius: '1rem'
-        }}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Create New Customer</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Name</label>
+        <div style={{ backgroundColor: '#1e293b', padding: '24px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #334155' }}>
+          <h3 style={{ margin: '0 0 16px 0' }}>Create New Customer</h3>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: '#94a3b8' }}>Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+                style={{ width: '100%', padding: '8px', borderRadius: '6px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff' }}
               />
             </div>
-            <div className="form-group">
-              <label>Email</label>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: '#94a3b8' }}>Email</label>
               <input
                 type="email"
                 value={formData.contactEmail}
                 onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
                 required
+                style={{ width: '100%', padding: '8px', borderRadius: '6px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff' }}
               />
             </div>
-            <div className="form-group">
-              <label>Phone</label>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: '#94a3b8' }}>Phone</label>
               <input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
+                style={{ width: '100%', padding: '8px', borderRadius: '6px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff' }}
               />
             </div>
-            <button type="submit" className="btn btn-success">
+            <button type="submit" style={{ padding: '10px', backgroundColor: '#16a34a', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>
               Create Customer
             </button>
           </form>
         </div>
       )}
 
-      {/* Customers List */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <div className="spinner"></div>
-        </div>
+        <p style={{ color: '#94a3b8' }}>Loading customers...</p>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '1.5rem'
-        }}>
-          {customers.length === 0 ? (
-            <div className="glass" style={{
-              padding: '3rem',
-              textAlign: 'center',
-              gridColumn: '1 / -1'
-            }}>
-              <p style={{ color: 'var(--text-secondary)' }}>No customers yet</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+          {customers.map((c) => (
+            <div key={c.id} style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '12px', border: '1px solid #334155' }}>
+              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#38bdf8' }}>{c.name}</h4>
+              <p style={{ margin: '4px 0', fontSize: '13px', color: '#cbd5e1' }}>✉️ {c.contactEmail}</p>
+              <p style={{ margin: '4px 0', fontSize: '13px', color: '#cbd5e1' }}>📞 {c.phone}</p>
             </div>
-          ) : (
-            customers.map(customer => (
-              <div key={customer.id} className="glass" style={{
-                padding: '1.5rem',
-                borderRadius: '1rem'
-              }}>
-                <h4 style={{ marginBottom: '0.5rem' }}>{customer.name}</h4>
-                <p style={{ margin: '0.25rem 0', fontSize: '0.875rem' }}>
-                  ✉️ {customer.contactEmail}
-                </p>
-                <p style={{ margin: '0.25rem 0', fontSize: '0.875rem' }}>
-                  📞 {customer.phone}
-                </p>
-                <div style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  marginTop: '1rem',
-                  paddingTop: '1rem',
-                  borderTop: '1px solid var(--border-color)'
-                }}>
-                  <button className="btn btn-primary btn-sm" style={{ flex: 1 }}>
-                    View
-                  </button>
-                  <button className="btn btn-secondary btn-sm" style={{ flex: 1 }}>
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+          ))}
         </div>
       )}
     </div>
-  )
+  );
 }
+

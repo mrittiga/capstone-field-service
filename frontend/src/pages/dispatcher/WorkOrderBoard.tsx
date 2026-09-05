@@ -1,134 +1,58 @@
-import { useState, useEffect } from 'react'
-import { WorkOrder, WorkOrderStatus } from '../../types/index'
-
-const STATUSES: WorkOrderStatus[] = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CLOSED']
+import React from 'react';
+import { useWorkOrders } from '../../context/WorkOrderContext';
 
 export default function WorkOrderBoard() {
-  const [boardData, setBoardData] = useState<Record<WorkOrderStatus, WorkOrder[]>>({
-    NEW: [],
-    ASSIGNED: [],
-    IN_PROGRESS: [],
-    ON_HOLD: [],
-    COMPLETED: [],
-    CLOSED: [],
-    CANCELLED: []
-  })
-  const [loading, setLoading] = useState(true)
+  const { orders, loading, updateStatus } = useWorkOrders();
 
-  useEffect(() => {
-    fetchWorkOrders()
-  }, [])
-
-  const fetchWorkOrders = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/work-orders?size=100', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      })
-      const data = await response.json()
-      
-      const organized = {
-        NEW: [],
-        ASSIGNED: [],
-        IN_PROGRESS: [],
-        ON_HOLD: [],
-        COMPLETED: [],
-        CLOSED: [],
-        CANCELLED: []
-      } as Record<WorkOrderStatus, WorkOrder[]>
-      
-      data.content?.forEach((wo: WorkOrder) => {
-        if (organized[wo.status]) {
-          organized[wo.status].push(wo)
-        }
-      })
-      
-      setBoardData(organized)
-    } catch (error) {
-      console.error('Failed to fetch work orders', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const statuses: Array<'PENDING' | 'IN_PROGRESS' | 'COMPLETED'> = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
 
   if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <div className="spinner"></div>
-      </div>
-    )
+    return <div style={{ padding: '20px', color: '#94a3b8' }}>Loading Kanban board...</div>;
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '1.5rem',
-      overflowX: 'auto',
-      paddingBottom: '1rem'
-    }}>
-      {STATUSES.map(status => (
-        <div key={status}>
-          <h3 style={{
-            marginBottom: '1rem',
-            padding: '0.75rem 1rem',
-            background: 'var(--primary)',
-            color: 'white',
-            borderRadius: '0.75rem',
-            textAlign: 'center'
-          }}>
-            {status} ({boardData[status].length})
-          </h3>
-          
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            minHeight: '400px',
-            padding: '1rem',
-            background: 'var(--glass-bg)',
-            border: '1px solid var(--glass-border)',
-            borderRadius: '1rem',
-            backdropFilter: 'blur(10px)'
-          }}>
-            {boardData[status].length === 0 ? (
-              <p style={{
-                textAlign: 'center',
-                color: 'var(--text-tertiary)',
-                padding: '2rem 0'
-              }}>
-                No work orders
-              </p>
-            ) : (
-              boardData[status].map(wo => (
-                <div key={wo.id} className="glass" style={{
-                  padding: '1rem',
-                  cursor: 'grab',
-                  borderRadius: '0.75rem'
-                }}>
-                  <p style={{
-                    fontWeight: '600',
-                    marginBottom: '0.25rem',
-                    fontSize: '0.95rem'
-                  }}>
-                    {wo.title}
-                  </p>
-                  <p style={{
-                    fontSize: '0.8rem',
-                    color: 'var(--text-tertiary)',
-                    margin: '0 0 0.5rem'
-                  }}>
-                    {wo.workOrderCode}
-                  </p>
-                  <span className="badge badge-primary" style={{ fontSize: '0.75rem' }}>
-                    {wo.priority}
-                  </span>
-                </div>
-              ))
-            )}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+      {statuses.map((status) => {
+        const columnOrders = orders.filter((o) => o.status === status);
+        return (
+          <div key={status} style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '12px', border: '1px solid #334155' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '14px', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '1px' }}>
+              {status.replace('_', ' ')} ({columnOrders.length})
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {columnOrders.length === 0 ? (
+                <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '20px 0' }}>No work orders</p>
+              ) : (
+                columnOrders.map((wo) => (
+                  <div key={wo.id} style={{ backgroundColor: '#0f172a', padding: '14px', borderRadius: '8px', border: '1px solid #334155' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#38bdf8', fontFamily: 'monospace' }}>{wo.id}</span>
+                      <span style={{ fontSize: '10px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: wo.priority === 'HIGH' ? '#7f1d1d' : '#713f12', color: wo.priority === 'HIGH' ? '#fca5a5' : '#fde047' }}>
+                        {wo.priority}
+                      </span>
+                    </div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '15px' }}>{wo.title}</h4>
+                    <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#94a3b8' }}>Customer: {wo.customer}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid #1e293b' }}>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>{wo.technician}</span>
+                      <select
+                        value={wo.status}
+                        onChange={(e) => updateStatus(wo.id, e.target.value as any)}
+                        style={{ backgroundColor: '#1e293b', color: '#fff', border: '1px solid #334155', borderRadius: '4px', padding: '2px 4px', fontSize: '12px' }}
+                      >
+                        <option value="PENDING">PENDING</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="COMPLETED">COMPLETED</option>
+                      </select>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
-  )
+  );
 }
+
