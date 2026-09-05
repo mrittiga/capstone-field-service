@@ -1,32 +1,32 @@
-# React + TypeScript + Vite
+# Capstone Frontend - Work Order Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A modern React + TypeScript + Vite frontend with beautiful glasmorphism design, dark mode toggle, and vertical sidebar navigation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+✨ **Glasmorphism Design** - Beautiful frosted glass UI with blur effects
+🌙 **Dark Mode** - Automatic dark/light theme toggle with localStorage persistence
+📱 **Responsive** - Mobile-friendly vertical sidebar and adaptive layouts
+🎨 **Modern UI** - Smooth animations and transitions
+🔐 **Role-Based Access** - Different dashboards for Dispatcher, Technician, Manager, Customer
+📊 **Real-Time Dashboards** - Live metrics and work order tracking
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js 18+
+- npm or pnpm
 
-## Expanding the Oxlint configuration
+### Installation
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+```bash
+cd capstone/frontend
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+# Install dependencies
+npm install
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+# Start development server
+npm run dev
+
+# Build for production
+npm run build

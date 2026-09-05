@@ -1,10 +1,29 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './styles.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { WorkOrderProvider } from './context/WorkOrderContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+const rootElement = document.getElementById('root');
+
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <AuthProvider>
+            <WorkOrderProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </WorkOrderProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </React.StrictMode>
+  );
+}
+

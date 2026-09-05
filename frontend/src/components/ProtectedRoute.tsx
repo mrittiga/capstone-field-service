@@ -1,16 +1,30 @@
-import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { UserRole } from '../types/index'
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: React.ReactNode
+  requiredRole: UserRole
 }
 
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { token } = useAuthStore();
+export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { user, loading } = useAuth()
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="spinner"></div>
+      </div>
+    )
   }
 
-  return <>{children}</>;
-};
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+
+  if (user.role !== requiredRole) {
+    return <Navigate to="/login" />
+  }
+
+  return <>{children}</>
+}
