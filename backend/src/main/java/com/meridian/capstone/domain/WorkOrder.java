@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "work_order")
@@ -18,16 +19,8 @@ public class WorkOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "work_order_code", unique = true)
     private String workOrderCode;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
-    private Site site;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
 
     @Column(nullable = false)
     private String title;
@@ -37,18 +30,29 @@ public class WorkOrder {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Priority priority;
+    private WorkOrderStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkOrderStatus status;
+    private Priority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
     @Column(name = "sla_due_date")
     private LocalDateTime slaDueDate;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     @Column(name = "total_parts_cost")
     private BigDecimal totalPartsCost;
@@ -62,19 +66,10 @@ public class WorkOrder {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (totalPartsCost == null) {
-            totalPartsCost = BigDecimal.ZERO;
-        }
-        if (totalTimeMinutes == null) {
-            totalTimeMinutes = 0L;
-        }
     }
 
     @PreUpdate
@@ -82,3 +77,4 @@ public class WorkOrder {
         updatedAt = LocalDateTime.now();
     }
 }
+
