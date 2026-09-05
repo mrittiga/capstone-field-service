@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 interface WorkOrder {
   id: string;
@@ -22,16 +22,19 @@ export const DispatcherDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'workorders' | 'users'>('dashboard');
 
+  // Work Orders State
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([
     { id: 'WO-101', title: 'HVAC Inspection', customer: 'Acme Corp', priority: 'High', status: 'In Progress', technician: 'Tech Dave' },
     { id: 'WO-102', title: 'Electrical Wiring Repair', customer: 'Nexus Ltd', priority: 'Medium', status: 'Pending', technician: 'Unassigned' },
   ]);
 
+  // Users State
   const [users, setUsers] = useState<UserRecord[]>([
     { id: 'U-1', name: 'John Dispatcher', email: 'dispatcher@test.com', role: 'Dispatcher' },
     { id: 'U-2', name: 'Dave Tech', email: 'tech@test.com', role: 'Technician' },
   ]);
 
+  // Modals & Form State
   const [showWOModal, setShowWOModal] = useState(false);
   const [newWO, setNewWO] = useState({ title: '', customer: '', priority: 'Medium', technician: 'Unassigned' });
 
@@ -70,35 +73,123 @@ export const DispatcherDashboard: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', color: '#f8fafc', fontFamily: 'sans-serif' }}>
-      <aside style={{ width: sidebarOpen ? '260px' : '70px', transition: 'all 0.3s ease', background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(12px)', borderRight: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px', boxSizing: 'border-box', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      
+      {/* GLASSMORPHISM SIDEBAR */}
+      <aside
+        style={{
+          width: sidebarOpen ? '260px' : '70px',
+          transition: 'all 0.3s ease',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(12px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          justify: 'space-between',
+          padding: '16px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+        }}
+      >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
             {sidebarOpen && <h2 style={{ margin: 0, fontSize: '20px', letterSpacing: '1px', color: '#38bdf8' }}>KEYSTONE</h2>}
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '8px', borderRadius: '6px', cursor: 'pointer' }}>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '8px', borderRadius: '6px', cursor: 'pointer' }}
+            >
               {sidebarOpen ? '◀' : '▶'}
             </button>
           </div>
+
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <button onClick={() => setActiveTab('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '8px', border: 'none', background: activeTab === 'dashboard' ? 'rgba(56, 189, 248, 0.2)' : 'transparent', color: activeTab === 'dashboard' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeTab === 'dashboard' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                color: activeTab === 'dashboard' ? '#38bdf8' : '#94a3b8',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
               📊 {sidebarOpen && <span>Dashboard</span>}
             </button>
-            <button onClick={() => setActiveTab('workorders')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '8px', border: 'none', background: activeTab === 'workorders' ? 'rgba(56, 189, 248, 0.2)' : 'transparent', color: activeTab === 'workorders' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
+
+            <button
+              onClick={() => setActiveTab('workorders')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeTab === 'workorders' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                color: activeTab === 'workorders' ? '#38bdf8' : '#94a3b8',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
               📋 {sidebarOpen && <span>Work Orders</span>}
             </button>
-            <button onClick={() => setActiveTab('users')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '8px', border: 'none', background: activeTab === 'users' ? 'rgba(56, 189, 248, 0.2)' : 'transparent', color: activeTab === 'users' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
+
+            <button
+              onClick={() => setActiveTab('users')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeTab === 'users' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                color: activeTab === 'users' ? '#38bdf8' : '#94a3b8',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
               👥 {sidebarOpen && <span>Manage Users</span>}
             </button>
           </nav>
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
-          {sidebarOpen && <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px' }}>{user?.email || 'dispatcher@test.com'}</div>}
-          <button onClick={logout} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: '16px' }}>
+          {sidebarOpen && (
+            <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user?.email || 'dispatcher@test.com'}
+            </div>
+          )}
+          <button
+            onClick={logout}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '8px',
+              border: 'none',
+              background: '#ef4444',
+              color: '#fff',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
             {sidebarOpen ? 'Logout' : '🚪'}
           </button>
         </div>
       </aside>
 
+      {/* MAIN CONTENT AREA */}
       <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        
+        {/* TAB 1: DASHBOARD */}
         {activeTab === 'dashboard' && (
           <div>
             <h1 style={{ margin: '0 0 20px 0' }}>Dispatcher Dashboard</h1>
@@ -115,12 +206,19 @@ export const DispatcherDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* TAB 2: WORK ORDERS */}
         {activeTab === 'workorders' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h1 style={{ margin: 0 }}>Work Orders</h1>
-              <button onClick={() => setShowWOModal(true)} style={{ padding: '10px 16px', background: '#38bdf8', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}>+ Add Work Order</button>
+              <button
+                onClick={() => setShowWOModal(true)}
+                style={{ padding: '10px 16px', background: '#38bdf8', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                + Add Work Order
+              </button>
             </div>
+
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
@@ -148,12 +246,19 @@ export const DispatcherDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* TAB 3: USERS */}
         {activeTab === 'users' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h1 style={{ margin: 0 }}>User Management</h1>
-              <button onClick={() => setShowUserModal(true)} style={{ padding: '10px 16px', background: '#4ade80', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}>+ Add User</button>
+              <button
+                onClick={() => setShowUserModal(true)}
+                style={{ padding: '10px 16px', background: '#4ade80', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                + Add User
+              </button>
             </div>
+
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
@@ -180,6 +285,7 @@ export const DispatcherDashboard: React.FC = () => {
         )}
       </main>
 
+      {/* CREATE WORK ORDER MODAL */}
       {showWOModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
@@ -201,6 +307,7 @@ export const DispatcherDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* CREATE USER MODAL */}
       {showUserModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
@@ -221,6 +328,7 @@ export const DispatcherDashboard: React.FC = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

@@ -12,6 +12,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (userData: any) => void;
+  register: (userData: any) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -31,26 +32,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         setUser(JSON.parse(storedUser));
       } catch (err) {
-        console.error('Failed to parse user session', err);
         localStorage.removeItem('user');
       }
     }
-
-    if (storedToken) {
-      setToken(storedToken);
-    }
-
+    if (storedToken) setToken(storedToken);
     setLoading(false);
   }, []);
 
   const login = (userData: any) => {
-    const jwtToken = userData.token || localStorage.getItem('token') || '';
+    const jwtToken = userData.token || 'demo-token-' + Date.now();
     setUser(userData);
     setToken(jwtToken);
     localStorage.setItem('user', JSON.stringify(userData));
-    if (jwtToken) {
-      localStorage.setItem('token', jwtToken);
-    }
+    localStorage.setItem('token', jwtToken);
+  };
+
+  const register = (userData: any) => {
+    login(userData);
   };
 
   const logout = () => {
@@ -61,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
@@ -76,4 +74,3 @@ export const useAuth = (): AuthContextType => {
 };
 
 export default AuthContext;
-
